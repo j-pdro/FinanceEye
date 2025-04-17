@@ -41,7 +41,7 @@ streamlit run app.py
 - Calcular retorno acumulado e volatilidade
 - Criar comparações visuais entre ativos
 - Adicionar filtros de datas e indicadores técnicos
-=======
+  ___________
 **Propósito:** Auxiliar investidores a visualizar e entender melhor suas carteiras com gráficos interativos e dados financeiros reais.
 
 **Tecnologias usadas:**
