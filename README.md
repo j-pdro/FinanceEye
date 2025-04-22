@@ -1,10 +1,10 @@
-# [FinanceEye 📊](https://financeeye.streamlit.app/)
+# FinanceEye 📊
 
 
 Um aplicativo web simples construído com Streamlit para visualizar dados históricos de ações e calcular retornos, utilizando dados do Yahoo Finance.
 
-<!-- Opcional: Adicionar um screenshot ou GIF aqui depois -->
-<!-- ![FinanceEye Screenshot](link_para_screenshot.png) -->
+👉 [Clique aqui para acessar o app](https://financeeye.streamlit.app/)
+
 
 ## ✨ Funcionalidades Principais
 
