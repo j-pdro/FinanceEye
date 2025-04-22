@@ -1,43 +1,59 @@
-# FinanceEye
+# FinanceEye 📊
 
-**Propósito:** Auxiliar investidores a visualizar e entender melhor suas carteiras com gráficos interativos e dados financeiros reais.
+Um aplicativo web simples construído com Streamlit para visualizar dados históricos de ações e calcular retornos, utilizando dados do Yahoo Finance.
 
-## Funcionalidades
+<!-- Opcional: Adicionar um screenshot ou GIF aqui depois -->
+<!-- ![FinanceEye Screenshot](link_para_screenshot.png) -->
 
-- Ajuste automático de tickers para mercados do Brasil (B3) e EUA (NYSE/NASDAQ).
-- Busca de informações básicas da empresa, como nome e setor.
-- Obtenção de dados históricos de preços com cache para otimizar desempenho.
-- Visualização de gráficos interativos (linha, área e candlestick).
-- Cálculo de retornos percentuais para janelas de 30, 90 e 365 dias.
+## ✨ Funcionalidades Principais
 
-## Tecnologias usadas
+*   Busca de dados históricos de preços (OHLCV - Open, High, Low, Close, Volume) para ações.
+*   Suporte para ativos da B3 (Brasil) e NYSE/NASDAQ (EUA), com ajuste automático do sufixo `.SA`.
+*   Seleção de intervalo de datas customizável.
+*   Visualização interativa do histórico de preços usando gráficos de Linha, Área ou Candlestick (Velas).
+*   Exibição do nome completo da empresa junto ao ticker.
+*   Cálculo e exibição de retornos percentuais para janelas de 30, 90 e 365 dias.
+*   Interface amigável e responsiva construída com Streamlit.
+*   Cache de dados para otimizar o desempenho e reduzir chamadas à API.
 
-- Python
-- Streamlit
-- yFinance
-- Plotly
+## 🛠️ Tecnologias Utilizadas
 
-## Como rodar
+*   **Python:** Linguagem de programação principal.
+*   **Streamlit:** Framework para criação rápida de aplicativos web de dados.
+*   **yfinance:** Biblioteca para buscar dados financeiros do Yahoo Finance.
+*   **Plotly:** Biblioteca para criação de gráficos interativos.
+*   **Pandas:** Biblioteca para manipulação e análise de dados.
 
-1. Instale as dependências:
-   ```bash
-   pip install -r requirements.txt
-   ```
+## 🚀 Instalação e Configuração
 
-2. Execute o aplicativo:
-   ```bash
-   streamlit run app.py
-   ```
+Siga os passos abaixo para configurar e executar o FinanceEye localmente:
 
-## Exemplo de uso
+1.  **Clone o repositório:**
+    ```bash
+    git clone <URL_DO_SEU_REPOSITORIO>
+    cd <NOME_DA_PASTA_DO_PROJETO>
+    ```
 
-1. Selecione o mercado (Brasil ou EUA).
-2. Insira o código do ativo (ex.: `PETR4` ou `AAPL`).
-3. Escolha o período e o tipo de gráfico.
-4. Clique em "Buscar" para visualizar os dados e gráficos.
+2.  **Crie e ative um ambiente virtual (recomendado):**
+    ```bash
+    # Para Linux/macOS
+    python3 -m venv venv
+    source venv/bin/activate
 
-## Próximos passos
+    # Para Windows
+    python -m venv venv
+    .\venv\Scripts\activate
+    ```
 
-- Adicionar múltiplos ativos simultâneos.
-- Implementar comparações visuais entre ativos.
-- Adicionar filtros de datas e indicadores técnicos.
+3.  **Instale as dependências:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+    *Observação:* Para instalar também as ferramentas de desenvolvimento (como `pytest`, `black`), use `pip install -r requirements-dev.txt`.
+
+## ▶️ Como Executar
+
+Com o ambiente virtual ativado e as dependências instaladas, execute o seguinte comando no terminal, na raiz do projeto:
+
+```bash
+streamlit run app.py
