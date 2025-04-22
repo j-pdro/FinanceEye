@@ -1,100 +1,178 @@
-import streamlit as st
-import yfinance as yf
-import pandas as pd
-import plotly.graph_objects as go
+# app.py
+"""
+FinanceEye – aplicativo Streamlit para visualização de preços
+"""
+
 from datetime import date, timedelta
+from typing import List
+import logging
 
-st.set_page_config(page_title="FinanceEye", layout="wide")
+import pandas as pd
+import streamlit as st
 
-# --- Função para buscar e limpar os dados ---
-@st.cache_data
-def fetch_data(ticker, start, end):
-    df = yf.download(ticker, start=start, end=end)
-    # Flatten MultiIndex columns if present
-    if isinstance(df.columns, pd.MultiIndex):
-        df.columns = df.columns.get_level_values(0)
-    return df.dropna()
+# Configuração básica de logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-# --- Título e descrição ---
-st.title("📊 FinanceEye")
-st.markdown(
-    "Visualize e compare ações das bolsas **B3 🇧🇷** ou **EUA 🇺🇸** com dados históricos interativos."
-)
+from data_fetcher import get_data_cached, get_company_info
+from visualizer import plot_price_history
 
-# --- Seleção da bolsa ---
-market = st.radio(
-    "Escolha a bolsa de valores:",
-    ["🇧🇷 Brasil (B3)", "🇺🇸 EUA (NASDAQ/NYSE)"]
-)
-suffix = ".SA" if "Brasil" in market else ""
+DEFAULT_LOOKBACK_DAYS = 400
+RETURNS_WINDOWS: List[int] = [30, 90, 365]
+# Formato CORRETO para st.date_input
+DATE_FORMAT = "DD/MM/YYYY"
+# Opções de mercado com bandeiras
+MARKET_OPTIONS = ["🇧🇷 Brasil (B3)", "🇺🇸 EUA (NYSE/NASDAQ)"]
 
-# --- Entrada do ticker ---
-ticker_input = st.text_input(
-    "Digite o código do ativo (ex: PETR4, AAPL)",
-    value=""
-).strip().upper()
+def adjust_ticker(ticker: str, market: str) -> str:
+    """Ajusta o sufixo do ticker com base no mercado selecionado."""
+    ticker = ticker.strip().upper()
+    # Verifica a opção selecionada pelas strings com bandeiras
+    if market == MARKET_OPTIONS[0]: # Brasil
+        if not ticker.endswith(".SA"):
+            logger.info(f"Adicionando sufixo '.SA' ao ticker {ticker}")
+            return f"{ticker}.SA"
+    elif market == MARKET_OPTIONS[1]: # EUA
+        if ticker.endswith(".SA"):
+            logger.info(f"Removendo sufixo '.SA' do ticker {ticker}")
+            return ticker[:-3]
+    return ticker # Retorna inalterado para outros casos ou se já estiver correto
 
-# --- Datas padrão ---
-end_date = date.today()
-start_date = end_date - timedelta(days=400)
+def main() -> None:
+    st.set_page_config(page_title="FinanceEye", layout="wide")
+    st.title("📊 FinanceEye")
 
-# --- Botão para buscar dados ---
-if st.button("📈 Buscar dados") and ticker_input:
-    ticker = ticker_input + suffix
-    df = fetch_data(ticker, start_date, end_date)
-
-    if df.empty:
-        st.warning(
-            "⚠️ Nenhum dado encontrado para esse ativo. Verifique o código e a bolsa selecionada."
-        )
-    else:
-        st.success(f"✅ Dados carregados para: {ticker}")
-
-        # Exibir dados brutos em expander
-        with st.expander("📄 Visualizar dados brutos"):
-            st.dataframe(df.tail(10))
-
-        # --- Seleção da coluna de preço ---
-        preco_coluna = 'Adj Close' if 'Adj Close' in df.columns else 'Close'
-        if preco_coluna not in df.columns:
-            st.error(
-                "❌ Coluna de preço ajustado ('Adj Close') ou fechamento ('Close') não encontrada."
+    # ----- Formulário na Sidebar para inputs e botão -----
+    with st.sidebar:
+        st.header("Configurações")
+        # Usar st.form para habilitar submissão com Enter
+        # O botão de submit DEVE estar dentro deste bloco 'with'
+        with st.form(key="input_form"):
+            market = st.radio(
+                "Selecione o Mercado",
+                options=MARKET_OPTIONS, # Usa a lista com bandeiras
+                index=0,
+                horizontal=True,
             )
-        else:
-            # --- Gráfico interativo ---
-            st.subheader(f"📈 Gráfico de preços - {ticker}")
-            fig = go.Figure()
-            fig.add_trace(
-                go.Scatter(
-                    x=df.index,
-                    y=df[preco_coluna],
-                    mode='lines',
-                    name='Preço'
-                )
+            raw_ticker = st.text_input(
+                "Código do ativo",
+                placeholder="Ex: PETR4 ou AAPL"
             )
-            fig.update_layout(
-                title=f"Evolução do preço de {ticker}",
-                xaxis_title="Data",
-                yaxis_title="Preço (R$ ou US$)",
-                template="plotly_white"
+            end_dt = st.date_input(
+                "Data final",
+                value=date.today(),
+                format=DATE_FORMAT # Usa o formato literal correto
+            )
+            start_dt = st.date_input(
+                "Data inicial",
+                value=end_dt - timedelta(days=DEFAULT_LOOKBACK_DAYS),
+                max_value=end_dt - timedelta(days=1), # Garante que start < end
+                format=DATE_FORMAT # Usa o formato literal correto
+            )
+            chart_type = st.selectbox(
+                "Tipo de gráfico",
+                ["line", "area", "candlestick"],
+                index=0,
+                format_func=lambda x: {"line": "Linha", "area": "Área", "candlestick": "Velas"}[x],
+            )
+            # Botão de submissão do formulário (DENTRO do st.form)
+            submitted = st.form_submit_button("📈 Buscar")
+            # Se o aviso de botão ausente persistir, pode ser um bug ou cache
+            # do Streamlit, mas a estrutura aqui está correta.
+
+    # ----- Processamento SÓ OCORRE APÓS SUBMISSÃO do formulário -----
+    if submitted:
+        # Validações básicas
+        if not raw_ticker:
+            st.error("Informe um código de ativo.")
+            st.stop() # Para a execução se o ticker estiver vazio
+
+        if start_dt >= end_dt:
+            # Esta validação é redundante se max_value for usado, mas mantemos por segurança
+            st.error("A data inicial deve ser anterior à data final.")
+            st.stop() # Para a execução
+
+        # Ajusta o ticker com base no mercado selecionado
+        ticker = adjust_ticker(raw_ticker, market)
+        st.info(f"Buscando dados para o ticker ajustado: {ticker}") # Feedback
+
+        # ----- Obtenção de dados -----
+        company_name = ticker # Fallback inicial
+        try:
+            with st.spinner(f"Carregando dados para {ticker}..."):
+                # 1. Busca informações da empresa (nome, etc.)
+                company_info = get_company_info(ticker)
+                company_name = company_info.get("longName", ticker)
+
+                # 2. Busca dados históricos
+                df = get_data_cached(ticker, start=start_dt, end=end_dt)
+
+        except ValueError as err:
+            st.error(f"Erro ao buscar dados: {err}")
+            # Sugestões baseadas no mercado selecionado
+            if market == MARKET_OPTIONS[0] and ".SA" not in ticker:
+                 st.warning("Verifique se o código do ativo da B3 está correto (ex: PETR4) e se a opção '🇧🇷 Brasil (B3)' está selecionada.")
+            elif market == MARKET_OPTIONS[1] and ".SA" in ticker:
+                 st.warning("Verifique se o código do ativo dos EUA está correto (ex: AAPL) e se a opção '🇺🇸 EUA (NYSE/NASDAQ)' está selecionada.")
+            st.stop() # Para a execução
+        except Exception as e: # Captura outros erros inesperados
+            st.error(f"Ocorreu um erro inesperado durante a busca de dados.")
+            logger.exception(f"Erro inesperado ao processar {ticker}: {e}")
+            st.stop() # Para a execução
+
+        # ----- Exibição dos Resultados -----
+        if df.empty:
+             st.warning(f"Não foram encontrados dados para '{ticker}' no período selecionado.")
+             st.stop()
+
+        st.subheader(f"Visualização para {company_name} ({ticker})")
+
+        # ----- Gráfico -----
+        try:
+            fig = plot_price_history(
+                df,
+                ticker=ticker,
+                company_name=company_name,
+                chart_type=chart_type
             )
             st.plotly_chart(fig, use_container_width=True)
+        except Exception as e:
+            st.error("Ocorreu um erro ao gerar o gráfico.")
+            logger.exception(f"Erro ao gerar gráfico para {ticker}: {e}")
+            st.stop()
 
-            # --- Tabela de retorno percentual ---
-            st.subheader("📊 Retorno percentual")
-            retorno_30 = ((df[preco_coluna].iloc[-1] / df[preco_coluna].iloc[-30]) - 1) * 100 if df.shape[0] >= 30 else None
-            retorno_90 = ((df[preco_coluna].iloc[-1] / df[preco_coluna].iloc[-90]) - 1) * 100 if df.shape[0] >= 90 else None
-            retorno_365 = ((df[preco_coluna].iloc[-1] / df[preco_coluna].iloc[-365]) - 1) * 100 if df.shape[0] >= 365 else None
 
-            tabela_retornos = pd.DataFrame(
-                {
-                    "Retorno (%)": [
-                        f"{retorno_30:.2f}%" if retorno_30 is not None else "N/D",
-                        f"{retorno_90:.2f}%" if retorno_90 is not None else "N/D",
-                        f"{retorno_365:.2f}%" if retorno_365 is not None else "N/D",
-                    ]
-                },
-                index=["30 dias", "90 dias", "1 ano"],
-            )
-            tabela_retornos.index.name = "Período"
-            st.table(tabela_retornos)
+        # ----- Retornos -----
+        st.subheader("Retornos percentuais no período")
+        metrics = []
+        for days in RETURNS_WINDOWS:
+            # Garante que temos dados suficientes E que o índice não está fora dos limites
+            if len(df) > days and -days-1 < len(df.index): # Checa se índice existe
+                 try:
+                     current_price = df["Close"].iloc[-1]
+                     past_price = df["Close"].iloc[-days-1] # Acessa 'days' dias úteis antes
+                     if pd.notna(current_price) and pd.notna(past_price) and past_price != 0:
+                         pct = (current_price / past_price - 1) * 100
+                         metrics.append((f"{days} dias", f"{pct:,.2f}%"))
+                     else:
+                          metrics.append((f"{days} dias", "N/D"))
+                 except IndexError:
+                     logger.warning(f"IndexError ao calcular retorno de {days} dias para {ticker}. len(df)={len(df)}")
+                     metrics.append((f"{days} dias", "N/D"))
+            else:
+                metrics.append((f"{days} dias", "N/D"))
+
+        if metrics:
+            cols = st.columns(len(metrics))
+            for i, (label, value) in enumerate(metrics):
+                cols[i].metric(label, value)
+        else:
+            st.info("Não foi possível calcular retornos para as janelas padrão.")
+
+    else:
+        # Mensagem inicial antes da primeira busca
+        st.info("Configure os parâmetros na barra lateral e clique em 'Buscar' ou pressione Enter no campo do ativo.")
+
+
+if __name__ == "__main__":
+    main()

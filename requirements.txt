@@ -1,3 +1,8 @@
-streamlit
-plotly
-yfinance
+pandas==2.2.2
+yfinance==0.2.38
+streamlit==1.34.0
+plotly==5.21.0
+pytest==8.2.2
+black==24.4.2
+isort==5.13.2
+mypy==1.10.0
