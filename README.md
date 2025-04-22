@@ -1,4 +1,4 @@
-# FinanceEye 📊 (https://financeeye.streamlit.app/)
+# [FinanceEye] 📊 (https://financeeye.streamlit.app/)
 
 Um aplicativo web simples construído com Streamlit para visualizar dados históricos de ações e calcular retornos, utilizando dados do Yahoo Finance.
 
