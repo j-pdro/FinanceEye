@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 from data_fetcher import get_data_cached, get_company_info
 from visualizer import plot_price_history
 
-DEFAULT_LOOKBACK_DAYS = 400
+DEFAULT_LOOKBACK_DAYS = 550
 RETURNS_WINDOWS: List[int] = [30, 90, 365]
 # Formato CORRETO para st.date_input
 DATE_FORMAT = "DD/MM/YYYY"
