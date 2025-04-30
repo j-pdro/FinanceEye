@@ -65,7 +65,8 @@ financeeye/
 ├── visualizer.py      # Módulo para gerar as visualizações (gráficos)
 ├── requirements.txt   # Lista de dependências Python
 ├── LICENSE            # Arquivo de licença (MIT)
-└── README.md          # Este arquivo ```
+└── README.md          # Este arquivo
+```
 
 
 ## Licença
