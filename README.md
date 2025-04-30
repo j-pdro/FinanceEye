@@ -2,7 +2,10 @@
 
 FinanceEye é uma aplicação web desenvolvida com Streamlit para visualizar dados históricos e informações básicas de ações, utilizando dados do Yahoo Finance.
 
+## Demonstração
 
+![Demonstração B3 🇧🇷](https://github.com/j-pdro/FinanceEye/blob/main/assets/streamlit-app-gif1-converter.gif)
+![Demonstração NASDAQ 🇺🇲](https://github.com/j-pdro/FinanceEye/blob/main/assets/streamlit-app-gif2-converter.gif)
 
 ## Funcionalidades
 
@@ -58,14 +61,16 @@ Para executar o FinanceEye em sua máquina local, siga os passos abaixo:
 ## Estrutura do Projeto
 ```text
 financeeye/
-│
+├── assets/
+│   ├── streamlit-app-gif1-converter.gif   
+│   └── streamlit-app-gif2-converter.gif 
 ├── .gitignore
-├── app.py             # Lógica principal da aplicação Streamlit (UI)
-├── data_fetcher.py    # Módulo para buscar dados da API/fonte externa
-├── visualizer.py      # Módulo para gerar as visualizações (gráficos)
-├── requirements.txt   # Lista de dependências Python
-├── LICENSE            # Arquivo de licença (MIT)
-└── README.md          # Este arquivo
+├── app.py
+├── data_fetcher.py
+├── visualizer.py
+├── requirements.txt
+├── LICENSE
+└── README.md
 ```
 
 
