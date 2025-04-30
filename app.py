@@ -88,7 +88,7 @@ def main() -> None:
             st.stop() # Para a execução se o ticker estiver vazio
 
         if start_dt >= end_dt:
-            # Esta validação é redundante se max_value for usado, mas mantemos por segurança
+            # Esta validação é redundante se max_value for usado, mas a ideia é manter por segurança
             st.error("A data inicial deve ser anterior à data final.")
             st.stop() # Para a execução
 
