@@ -1,10 +1,8 @@
 # FinanceEye 📊
 
-
 Um aplicativo web simples construído com Streamlit para visualizar dados históricos de ações e calcular retornos, utilizando dados do Yahoo Finance.
 
 👉 [Clique aqui para acessar o app](https://financeeye.streamlit.app/)
-
 
 ## ✨ Funcionalidades Principais
 
@@ -31,8 +29,8 @@ Siga os passos abaixo para configurar e executar o FinanceEye localmente:
 
 1.  **Clone o repositório:**
     ```bash
-    git clone <URL_DO_SEU_REPOSITORIO>
-    cd <NOME_DA_PASTA_DO_PROJETO>
+    git clone git@github.com:j-pdro/FinanceEye.git
+    cd FinanceEye
     ```
 
 2.  **Crie e ative um ambiente virtual (recomendado):**
@@ -50,7 +48,10 @@ Siga os passos abaixo para configurar e executar o FinanceEye localmente:
     ```bash
     pip install -r requirements.txt
     ```
-    *Observação:* Para instalar também as ferramentas de desenvolvimento (como `pytest`, `black`), use `pip install -r requirements-dev.txt`.
+    *Observação:* Para instalar também as ferramentas de desenvolvimento (como `pytest`, `black`), use:
+    ```bash
+    pip install -r requirements-dev.txt
+    ```
 
 ## ▶️ Como Executar
 
@@ -58,3 +59,10 @@ Com o ambiente virtual ativado e as dependências instaladas, execute o seguinte
 
 ```bash
 streamlit run app.py
+```
+
+## 📈 Próximos Passos
+
+- Adicionar suporte para múltiplos ativos simultâneos.
+- Implementar comparações visuais entre ativos.
+- Adicionar filtros de datas e indicadores técnicos.
