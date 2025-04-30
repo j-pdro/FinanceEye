@@ -1,68 +1,76 @@
 # FinanceEye 📊
 
-Um aplicativo web simples construído com Streamlit para visualizar dados históricos de ações e calcular retornos, utilizando dados do Yahoo Finance.
+FinanceEye é uma aplicação web desenvolvida com Streamlit para visualizar dados históricos e informações básicas de ações, utilizando dados do Yahoo Finance.
 
-👉 [Clique aqui para acessar o app](https://financeeye.streamlit.app/)
+**(Aqui entra o GIF/Vídeo da demonstração)**
 
-## ✨ Funcionalidades Principais
+## Funcionalidades
 
-*   Busca de dados históricos de preços (OHLCV - Open, High, Low, Close, Volume) para ações.
-*   Suporte para ativos da B3 (Brasil) e NYSE/NASDAQ (EUA), com ajuste automático do sufixo `.SA`.
-*   Seleção de intervalo de datas customizável.
+*   Busca de dados históricos de ações (OHLCV - Open, High, Low, Close, Volume).
 *   Visualização interativa do histórico de preços usando gráficos de Linha, Área ou Candlestick (Velas).
-*   Exibição do nome completo da empresa junto ao ticker.
-*   Cálculo e exibição de retornos percentuais para janelas de 30, 90 e 365 dias.
-*   Interface amigável e responsiva construída com Streamlit.
-*   Cache de dados para otimizar o desempenho e reduzir chamadas à API.
+*   Exibição do nome da empresa associado ao ticker.
+*   Cálculo e exibição de retornos percentuais para períodos definidos (30, 90, 365 dias).
+*   Interface amigável construída com Streamlit.
+*   Suporte inicial para ativos da B3 (Brasil) e NYSE/NASDAQ (EUA) com ajuste automático de sufixo (`.SA`).
 
-## 🛠️ Tecnologias Utilizadas
+## Aviso Importante sobre Fonte de Dados e Deploy
 
-*   **Python:** Linguagem de programação principal.
-*   **Streamlit:** Framework para criação rápida de aplicativos web de dados.
-*   **yfinance:** Biblioteca para buscar dados financeiros do Yahoo Finance.
-*   **Plotly:** Biblioteca para criação de gráficos interativos.
-*   **Pandas:** Biblioteca para manipulação e análise de dados.
+Este aplicativo utiliza a biblioteca `yfinance` para obter dados do Yahoo Finance. É importante notar que `yfinance` não é uma API oficial e depende de scraping de dados públicos do Yahoo Finance, o que pode levar a instabilidades e bloqueios por limite de taxa (Rate Limiting), especialmente em ambientes de nuvem compartilhados.
 
-## 🚀 Instalação e Configuração
+**Tentativa de Deploy:** Foi realizada uma tentativa de deploy desta aplicação no Streamlit Community Cloud. No entanto, a aplicação encontrou erros frequentes de limite de taxa (HTTP 429 "Too Many Requests") da API do Yahoo Finance. Mesmo com a implementação de mecanismos de retentativa com espera exponencial (`backoff`) no arquivo `data_fetcher.py`, os limites impostos pelo provedor de dados no ambiente de nuvem compartilhado se mostraram muito restritivos para um funcionamento estável.
 
-Siga os passos abaixo para configurar e executar o FinanceEye localmente:
+**Uso Local:** Recomenda-se executar esta aplicação **localmente** em sua própria máquina. Ao rodar localmente, as requisições são feitas a partir do seu próprio endereço IP, o que **reduz significativamente** a probabilidade de encontrar os limites de taxa agressivos observados no ambiente de nuvem. No entanto, o `yfinance` ainda pode ocasionalmente falhar dependendo dos limites do Yahoo Finance.
 
-1.  **Clone o repositório:**
+**Adaptação para Outras APIs:** O módulo `data_fetcher.py` foi estruturado para encapsular a lógica de busca de dados. Se você possui uma chave de API para um provedor de dados financeiros diferente (como Alpha Vantage, Financial Modeling Prep, IEX Cloud, etc.), você pode adaptar as funções dentro de `data_fetcher.py` (`get_company_info`, `get_data_cached`, etc.) para utilizar essa API. Isso exigirá modificar o código para fazer as chamadas à API escolhida, tratar a autenticação (geralmente via chave de API) e ajustar o processamento para o formato de dados retornado pela nova API.
+
+## Instalação e Execução Local
+
+Para executar o FinanceEye em sua máquina local, siga os passos abaixo:
+
+1.  **Clone o Repositório:**
     ```bash
-    git clone git@github.com:j-pdro/FinanceEye.git
-    cd FinanceEye
+    git clone https://github.com/seu-usuario/financeeye.git
+    cd financeeye
     ```
+    *(Substitua `seu-usuario/financeeye` pelo caminho real do seu repositório)*
 
-2.  **Crie e ative um ambiente virtual (recomendado):**
+2.  **Crie um Ambiente Virtual (Recomendado):**
     ```bash
-    # Para Linux/macOS
-    python3 -m venv venv
-    source venv/bin/activate
-
-    # Para Windows
     python -m venv venv
+    # No Windows:
     .\venv\Scripts\activate
+    # No macOS/Linux:
+    source venv/bin/activate
     ```
 
-3.  **Instale as dependências:**
+3.  **Instale as Dependências:**
     ```bash
     pip install -r requirements.txt
     ```
-    *Observação:* Para instalar também as ferramentas de desenvolvimento (como `pytest`, `black`), use:
+
+4.  **Execute a Aplicação Streamlit:**
     ```bash
-    pip install -r requirements-dev.txt
+    streamlit run app.py
     ```
 
-## ▶️ Como Executar
+5.  Abra seu navegador e acesse o endereço fornecido pelo Streamlit (geralmente `http://localhost:8501`).
 
-Com o ambiente virtual ativado e as dependências instaladas, execute o seguinte comando no terminal, na raiz do projeto:
+## Estrutura do Projeto
+financeeye/
+│
+├── .gitignore
+├── app.py # Lógica principal da aplicação Streamlit (UI)
+├── data_fetcher.py # Módulo para buscar dados da API/fonte externa
+├── visualizer.py # Módulo para gerar as visualizações (gráficos)
+├── requirements.txt # Lista de dependências Python
+├── LICENSE # Arquivo de licença (MIT)
+└── README.md # Este arquivo
 
-```bash
-streamlit run app.py
-```
 
-## 📈 Próximos Passos
+## Licença
 
-- Adicionar suporte para múltiplos ativos simultâneos.
-- Implementar comparações visuais entre ativos.
-- Adicionar filtros de datas e indicadores técnicos.
+Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## Contribuições
+
+Contribuições são bem-vindas! Sinta-se à vontade para abrir *issues* ou *pull requests*.
