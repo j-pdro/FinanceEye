@@ -34,7 +34,7 @@ Period = Literal[
 ]
 
 # Função auxiliar para retry 
-def fetch_with_retry(api_call_func, max_retries=3, initial_delay=1):
+def fetch_with_retry(api_call_func, max_retries=5, initial_delay=2):
     """Tenta executar uma função de chamada de API com retentativas e backoff."""
     retries = 0
     delay = initial_delay
