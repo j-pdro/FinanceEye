@@ -78,6 +78,6 @@ financeeye/
 
 Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-## Contribuições
+## 🤝 Contribuição
 
-Contribuições são bem-vindas! Sinta-se à vontade para abrir *issues* ou *pull requests*.
+Este projeto foi desenvolvido como um exercício prático e para fins de portfólio. Sinta-se à vontade para clonar, modificar e usar como base para seus próprios projetos. Pull requests com melhorias ou correções são bem-vindos.
